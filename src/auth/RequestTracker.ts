@@ -4,9 +4,9 @@ export class RequestTracker {
     this._timeOfFirstRequest = new Date();
   }
 
-  private _numberOfRequests: number;
+  public _numberOfRequests: number;
 
-  private _timeOfFirstRequest: Date;
+  public _timeOfFirstRequest: Date;
 
   get numberOfRequests(): number {
     return this._numberOfRequests;

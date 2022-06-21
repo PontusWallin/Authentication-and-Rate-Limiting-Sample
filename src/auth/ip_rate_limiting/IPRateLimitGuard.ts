@@ -15,16 +15,18 @@ export class IPRateLimitGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const ipAddress = context.switchToHttp().getRequest().ip;
-    const rateLimitResponse = this.authService.isIPOverRateLimit(ipAddress);
-    if (rateLimitResponse.isOverLimit) {
-      throw new ThrottlerException(
-        'ThrottlerException: Too Many Requests - Your current limit is ' +
-          this.configService.get('MAX_REQUESTS_PER_IP') +
-          '. Try Again After ' +
-          rateLimitResponse.limitResetTime.toLocaleTimeString(),
-      );
-    }
-
-    return true;
+    return this.authService
+      .isIPOverRateLimit(ipAddress)
+      .then((rateLimitResponse) => {
+        if (rateLimitResponse.isOverLimit) {
+          throw new ThrottlerException(
+            'ThrottlerException: Too Many Requests - Your current limit is ' +
+              this.configService.get('MAX_REQUESTS_PER_IP') +
+              '. Try Again After ' +
+              rateLimitResponse.limitResetTime.toLocaleTimeString(),
+          );
+        }
+        return true;
+      });
   }
 }

@@ -2,7 +2,11 @@
 
 This is a nestjs web application which demonstrates how to implement JWT-based authentication guards and custom made rate limiting guards on to REST endpoints.
 ## How to use it
-Launch the application from your IDE, or using console commands. The application will run port 3000. Use any web browser and navigate to http://localhost:3000/api/ to interact with the application using a Swagger RESTful API interface. 
+Set up the Redis container by running the docker-compose.yml file.
+
+Launch the application from your IDE, or using console commands. The application will run port 3000.
+
+Use any web browser and navigate to http://localhost:3000/api/ to interact with the application using a Swagger RESTful API interface. 
 
 The available endpoints are:
 

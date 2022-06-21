@@ -4,6 +4,7 @@ import { PublicService } from './public.service';
 import { RateLimitResponse } from '../auth/RateLimitResponse';
 import { AuthService } from '../auth/auth.service';
 import { ConfigService } from '@nestjs/config';
+import { CacheModule } from '@nestjs/common';
 
 const expectedMessage = 'Public Hello';
 describe('PublicController', () => {
@@ -34,6 +35,7 @@ describe('PublicController', () => {
     };
 
     const module = await Test.createTestingModule({
+      imports: [CacheModule.register()],
       controllers: [PublicController],
       providers: [
         {
@@ -59,7 +61,9 @@ describe('PublicController', () => {
   });
 
   it('should say "Public Hello" ', async () => {
-    const actual = controller.getHello();
-    expect(actual).toEqual(expectedMessage);
+    const promise = controller.getHello();
+    promise.then((actual) => {
+      expect(actual).toEqual(expectedMessage);
+    });
   });
 });

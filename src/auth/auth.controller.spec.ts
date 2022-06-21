@@ -16,9 +16,11 @@ describe('AuthController', () => {
       getToken: (): { access_token: string } => {
         return testToken;
       },
-      isIPOverRateLimit: (): RateLimitResponse => {
-        return new RateLimitResponse(false, null);
-      },
+      isIPOverRateLimit: (): Promise<RateLimitResponse> => {
+        return Promise<RateLimitResponse>.resolve(
+          new RateLimitResponse(false, null)
+        );
+      }
     };
 
     const mockConfigService = {

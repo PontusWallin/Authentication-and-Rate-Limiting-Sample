@@ -19,21 +19,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: { username: string; role: string }) {
-    const rateLimitResponse = this.authService.isUsernameOverRateLimit(
-      payload.username,
-    );
-    if (rateLimitResponse.isOverLimit) {
-      throw new ThrottlerException(
-        'ThrottlerException: Too Many Requests - Your current limit is ' +
-          this.configService.get('MAX_REQUESTS_PER_TOKEN') +
-          '. Try Again After ' +
-          rateLimitResponse.limitResetTime.toLocaleTimeString(),
-      );
-    }
+    return this.authService
+      .isUsernameOverRateLimit(payload.username)
+      .then((rateLimitResponse) => {
+        if (rateLimitResponse.isOverLimit) {
+          throw new ThrottlerException(
+            'ThrottlerException: Too Many Requests - Your current limit is ' +
+              this.configService.get('MAX_REQUESTS_PER_TOKEN') +
+              '. Try Again After ' +
+              rateLimitResponse.limitResetTime.toLocaleTimeString(),
+          );
+        }
 
-    return {
-      username: payload.username,
-      role: payload.role,
-    };
+        return {
+          username: payload.username,
+          role: payload.role,
+        };
+      });
   }
 }

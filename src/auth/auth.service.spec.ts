@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RateLimitResponse } from './RateLimitResponse';
+import { CacheModule } from '@nestjs/common';
 
 const SHORT_TEST_TIME_INTERVAL = '100';
 describe('AuthService', () => {
@@ -37,6 +38,7 @@ describe('AuthService', () => {
     };
 
     const module = await Test.createTestingModule({
+      imports: [CacheModule.register()],
       providers: [
         AuthService,
         {
@@ -68,15 +70,19 @@ describe('AuthService', () => {
       service.isUsernameOverRateLimit('test_user');
     }
 
-    const actual = service.isUsernameOverRateLimit('test_user');
-    expect(actual.isOverLimit).toEqual(true);
-    expect(actual.limitResetTime).toBeDefined();
+    const promise = service.isUsernameOverRateLimit('test_user');
+    promise.then((actual) => {
+      expect(actual.isOverLimit).toEqual(true);
+      expect(actual.limitResetTime).toBeDefined();
+    });
   });
 
   it('returns correct response when username is NOT over rate limit ', () => {
-    const actual = service.isUsernameOverRateLimit('test_user');
-    expect(actual.isOverLimit).toEqual(false);
-    expect(actual.limitResetTime).toBeNull();
+    const promise = service.isUsernameOverRateLimit('test_user');
+    promise.then((actual) => {
+      expect(actual.isOverLimit).toEqual(false);
+      expect(actual.limitResetTime).toBeNull();
+    });
   });
 
   it('returns correct response after rate limit time is reset (username)', async () => {
@@ -89,8 +95,10 @@ describe('AuthService', () => {
       setTimeout(resolve, parseInt(SHORT_TEST_TIME_INTERVAL)),
     );
 
-    const actual = service.isUsernameOverRateLimit('test_user');
-    expect(actual).toEqual(new RateLimitResponse(false, null));
+    const promise = service.isUsernameOverRateLimit('test_user');
+    promise.then((actual) => {
+      expect(actual).toEqual(new RateLimitResponse(false, null));
+    });
   });
 
   it('returns correct response when IP is over rate limit ', () => {
@@ -99,15 +107,19 @@ describe('AuthService', () => {
       service.isIPOverRateLimit('123.123.123');
     }
 
-    const actual = service.isIPOverRateLimit('123.123.123');
-    expect(actual.isOverLimit).toEqual(true);
-    expect(actual.limitResetTime).toBeDefined();
+    const promise = service.isIPOverRateLimit('123.123.123');
+    promise.then((actual) => {
+      expect(actual.isOverLimit).toEqual(true);
+      expect(actual.limitResetTime).toBeDefined();
+    });
   });
 
   it('returns correct response when IP is NOT over rate limit ', () => {
-    const actual = service.isIPOverRateLimit('123.123.123');
-    expect(actual.isOverLimit).toEqual(false);
-    expect(actual.limitResetTime).toBeNull();
+    const promise = service.isIPOverRateLimit('123.123.123');
+    promise.then((actual) => {
+      expect(actual.isOverLimit).toEqual(false);
+      expect(actual.limitResetTime).toBeNull();
+    });
   });
 
   it('returns correct response after rate limit time is reset (IP address)', async () => {
@@ -120,7 +132,9 @@ describe('AuthService', () => {
       setTimeout(resolve, parseInt(SHORT_TEST_TIME_INTERVAL)),
     );
 
-    const actual = service.isIPOverRateLimit('123.123.123');
-    expect(actual).toEqual(new RateLimitResponse(false, null));
+    const promise = service.isIPOverRateLimit('123.123.123');
+    promise.then((actual) => {
+      expect(actual).toEqual(new RateLimitResponse(false, null));
+    });
   });
 });
